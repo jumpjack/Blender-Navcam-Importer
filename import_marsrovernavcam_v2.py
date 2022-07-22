@@ -12,7 +12,8 @@ import time
 import re
 from datetime import datetime
 
-# 0.3.1
+
+# 0.3.2
 # Missing texture is no more critical error: mesh is created without texture
 # Even missing XYZ data is not critical, so batch processing will continue with available data
 
@@ -21,10 +22,12 @@ from datetime import datetime
 # Added support for alternate texture (EFF or FFL)
 # Added comments/explanations on naming convention
 
+
+
 bl_info = {
     "name": "Mars Rover Multicam Import",
     "author": "Jumpjack (credits: Rob Haarsma)",
-    "version": (0, 3, 1),
+    "version": (0, 3, 2),
     "blender": (2, 80, 0),
     "location": "File > Import > ...  and/or 3D Window Tools menu > Mars Rover Multicam Import",
     "description": "Creates Martian landscapes from Mars Rover Navcam/Pancam/Hazcam images",
@@ -37,7 +40,7 @@ bl_info = {
 pdsimg_path = 'https://pds-imaging.jpl.nasa.gov/data/'
 # mirror: https://pdsimage2.wr.usgs.gov/data/mer2no/mer2no_0xxx/data/sol1869/rdr/
 
-nasaimg_path = 'https://mars.nasa.gov/'  
+nasaimg_path = 'https://pds-imaging.jpl.nasa.gov/data/' # 'https://mars.nasa.gov/'
 # https://pds-imaging.jpl.nasa.gov/data/mer2-m-navcam-5-xyz-ops-v1.0/mer2no_0xxx/data/
 # https://pds-imaging.jpl.nasa.gov/data/mer/mer2no_0xxx/data/
 
@@ -125,52 +128,52 @@ def ReadNavcamString(inString, inFillBool, inRadBool):
         if theString.startswith( '2N' ) :
             rover = SPIRIT
             roverCamera == 'navcam'
-            roverDataDir = 'mer/mer2no_0xxx/data/'  
-            roverImageDir = 'mer/gallery/all/2/n/'  
+            roverDataDir = 'mer/spirit/mer2no_0xxx/data/' #  'mer/mer2no_0xxx/data/'
+            roverImageDir = 'mer/spirit/mer2no_0xxx/browse/'  # 'mer/gallery/all/2/n/'  
             print ('Detected image from navcam')
         if theString.startswith( '2P' ) :
             rover = SPIRIT
             roverCamera == 'pancam'
-            roverDataDir = 'mer/mer2po_0xxx/data/'  
-            roverImageDir = 'mer/gallery/all/2/p/'  
+            roverDataDir = 'mer/spirit/mer2po_0xxx/data/' #  'mer/mer2po_0xxx/data/'
+            roverImageDir = 'mer/spirit/mer2po_0xxx/browse/' #'mer/gallery/all/2/p/'
             print ('Detected image from PANCAM')
         if theString.startswith( '2F' ) :
             rover = SPIRIT
             roverCamera == 'fhazcam'
-            roverDataDir = 'mer/mer2ho_0xxx/data/'  
-            roverImageDir = 'mer/gallery/all/2/h/'  
+            roverDataDir = 'mer/spirit/mer2ho_0xxx/data/' #  'mer/mer2ho_0xxx/data/'
+            roverImageDir = 'mer/spirit/mer2ho_0xxx/browse/' #'mer/gallery/all/2/h/'
             print ('Detected image from FRONT HAZCAM')
         if theString.startswith( '2R' ) :
             rover = SPIRIT
             roverCamera == 'rhazcam'
-            roverDataDir = 'mer/mer2ho_0xxx/data/'  
-            roverImageDir = 'mer/gallery/all/2/h/'  
+            roverDataDir = 'mer/spirit/mer2ho_0xxx/data/' #'mer/mer2ho_0xxx/data/'
+            roverImageDir = 'mer/spirit/mer2ho_0xxx/browse/' #'mer/gallery/all/2/h/'
             print ('Detected image from REAR HAZCAM')
             
             
         if theString.startswith( '1N' ) :
             rover = OPPORTUNITY
             roverCamera == 'navcam'
-            roverDataDir = 'mer/mer1no_0xxx/data/'  
-            roverImageDir = 'mer/gallery/all/1/n/'  
+            roverDataDir = 'mer/opportunity/mer1no_0xxx/data/' #'mer/mer1no_0xxx/data/'
+            roverImageDir = 'mer/opportunity/mer1no_0xxx/browse/' # 'mer/gallery/all/1/n/'
             print ('Detected image from navcam')
         if theString.startswith( '1P' ) :
             rover = OPPORTUNITY
             roverCamera == 'pancam'
-            roverDataDir = 'mer/mer1po_0xxx/data/'  
-            roverImageDir = 'mer/gallery/all/1/p/'  
+            roverDataDir = 'mer/opportunity/mer1po_0xxx/data/' #'mer/mer1po_0xxx/data/'
+            roverImageDir = 'mer/opportunity/mer1po_0xxx/browse/' # 'mer/gallery/all/1/p/'
             print ('Detected image from PANCAM')
         if theString.startswith( '1F' ) :
             rover = OPPORTUNITY
             roverCamera == 'fhazcam'
-            roverDataDir = 'mer/mer1ho_0xxx/data/'  
-            roverImageDir = 'mer/gallery/all/1/h/'  
+            roverDataDir = 'mer/opportunity/mer1ho_0xxx/data/' #'mer/mer1ho_0xxx/data/'
+            roverImageDir = 'mer/opportunity/mer1ho_0xxx/browse/' # 'mer/gallery/all/1/h/'
             print ('Detected image from FRONT HAZCAM')
         if theString.startswith( '1R' ) :
             rover = OPPORTUNITY
             roverCamera == 'rhazcam'
-            roverDataDir = 'mer/mer1ho_0xxx/data/'  
-            roverImageDir = 'mer/gallery/all/1/h/'  
+            roverDataDir = 'mer/opportunity/mer1ho_0xxx/data/' #'mer/mer1ho_0xxx/data/'
+            roverImageDir = 'mer/opportunity/mer1ho_0xxx/browse/' # 'mer/gallery/all/1/h/'
             print ('Detected image from REAR HAZCAM')
             
             
@@ -201,23 +204,16 @@ def ReadNavcamString(inString, inFillBool, inRadBool):
         else:
             image_texture_filename = get_texture_image(rover, sol_ref, theString)
 
-        print('Texture in use: ', image_texture_filename)
+        print('Texture selected: ', image_texture_filename)
         if (image_texture_filename == None):
-            #popup_error = 1
-            #bpy.context.window_manager.popup_menu(draw, title="URL Error", icon='ERROR')
             print ('Texture not found, going on...') #Example: 2N295212876EFFB1DNP1950L0M1
-            #return # ignore errors, create mesh without texture
-
 
         image_depth_filename = get_depth_image(rover, sol_ref, theString)
         if (image_depth_filename == None):
-            #popup_error = 2
-            #bpy.context.window_manager.popup_menu(draw, title="URL Error", icon='ERROR')
             print (' ')
             print (' >>>>>>> ERROR <<<<<<<<< XYZ file not found for id:', theString)
             print (' ')
             #example: 2N295460956EFFB1DNP1983L0M1 (not in sol 1904 but 1905)
-            #return
         else:
           create_mesh_from_depthimage(rover, sol_ref, image_depth_filename, image_texture_filename, inFillBool, inRadBool)
 
@@ -250,10 +246,13 @@ def SetRenderSettings():
 def download_file(url):
     global localfile
     proper_url = url.replace('\\','/')
+    print('**DOWNLOAD:', proper_url)
 
     if sys.platform == 'darwin':
         try:
             out = subprocess.check_output(['curl', '-I', proper_url])
+            print('**DOWNLOAD OUT:')
+            print(out)
 
             if out.decode().find('200 OK') > 0:
                 subprocess.call(['curl', '-o', localfile, '-L', proper_url])
@@ -292,7 +291,7 @@ def tosol(rover, nameID):
     # 11-13: XYL       = XYL product
     # 14-15: B0        = site
     # 16-17: HM        = drive/position w.r.t site
-    # 18-22: P0755     = sequence (“P”  -  PMA & Remote Sensing instr.  (Pancam, Navcam, Hazcam, MI, Mini-TES) 
+    # 18-22: P0755     = sequence (“P”  -  PMA & RemoteSensing instr.  (Pancam, Navcam, Hazcam, MI, Mini-TES)
     # 23:    L         = left
     # 24:    0         = filter
     # 25:    M         = Author (MIPL)
@@ -359,7 +358,7 @@ def get_texture_image(rover, sol, imgname):
         else:
             texname = '%s.JPG' %( imgname )
     else:
-        texname = '%s.JPG' %( imgname )
+        texname = '%s.img.JPG' %( imgname )
 
     s = list( texname )
 
@@ -370,92 +369,143 @@ def get_texture_image(rover, sol, imgname):
         s[35] = '1'
     else:
         # Full frame EDR “EFF”
-        # Sub-frame EDR “ESF”
-        # Downsampled EDR “EDN”
-        # Thumbnail EDR “ETH”
-        # Row Summed EDR “ERS”
-        # Column Summed EDR “ECS”
-        # Reference Pixels EDR “ERP”
-        # Histogram EDR “EHG”
+        # Full frame EDR “EFF” n/a
+        # Radiometrically-corrected RDR calibrated to absolute radiance units “RAD” “RAL”
+        # MIPLRAD Radiometrically-corrected RDR calibrated to absolute radiance units, specific to archived datasets only “MRD” “MRL”
+        # Rad-corrected Float (32-bit) RDR “RFD” “RFL”
+        # Radiometrically-corrected RDR calibrated to I/F radiance factor “IOF” “IOL”
+        # Rad-corrected Float (32-bit) RDR calibrated to I/F radiance factor “IFF” “IFL”
+        # Sum of Rad-corrected Float (32-bit) RDR calibrated to I/F radiance factor, produced by MI Athena team “IFS” n/a
 
-        if s[18] == 'F' or s[18] == 'f':  # sequence (“P”  -  PMA & Remote Sensing instr.  (Pancam, Navcam, Hazcam, MI, Mini-TES) 
+        if s[18] == 'F' or s[18] == 'f':  # ? char 18 is always "P" for images sequences (“P”  -  PMA & Remote Sensing instr.  (Pancam, Navcam, Hazcam, MI, Mini-TES)
             #mer downsampled??
             s[11] = 'e'
             s[12] = 'd'
             s[13] = 'n'
-            s[25] = 'm'  
+            s[25] = 'm'  # Useless? "M" stands for "MIPS", author of image, and is contant
+            s[26] = '1'  # Force use of version 1 of texture
         else:
             s[11] = 'e'
             s[12] = 'f'
             s[13] = 'f'
-            s[25] = 'm'  
+            s[25] = 'm'  # Useless? "M" stands for "MIPS", author of image, and is contant
+            s[26] = '1'  # Force use of version 1 of texture
 
     imagename = '%s' % "".join(s)
     print ('local_data_dir :', local_data_dir)
     print ('roverImageDir :', roverImageDir)
     print ('sol :', sol )
     print ('imagename :', imagename)
-    imgfilename = os.path.join(local_data_dir, roverImageDir, '%05d' %(sol), imagename )
-   
+    # imgfilename = os.path.join(local_data_dir, roverImageDir, '%05d' %(sol), imagename )
+    imgfilename = os.path.join(local_data_dir, roverImageDir, 'sol%04d' %(sol), 'rdr', imagename )
+
     print('Looking for EFF texture in cache: ', imgfilename)
+
     if os.path.isfile(imgfilename):
-        print('Loading EFF texture from cache: ', imgfilename)
+        print('   EFF texture found, loading...')
         return imgfilename
     else :
       s[11] = 'f'
       s[12] = 'f'
       s[13] = 'l'
       s[25] = 'm'  
+      s[26] = '1'  # Force use of version 1 of texture
       imagename2 = '%s' % "".join(s)
-      imgfilename2 = os.path.join(local_data_dir, roverImageDir, '%05d' %(sol), imagename2 )
-      print('EFF texture not found; looking for alternative (FFL) texture in cache: ', imgfilename2)
+      imgfilename2 = os.path.join(local_data_dir, roverImageDir, 'sol%04d' %(sol), 'rdr', imagename2 )
+      print('#### EFF texture not found; looking for alternative (FFL) texture in cache: ', imgfilename2)
       if os.path.isfile(imgfilename2):
-          print('Loading FFL texture from cache: ', imgfilename2)
+          print('   ----> FFL texture found, loading...')
           return imgfilename2
-    
+      else :
+        s[11] = 'm'
+        s[12] = 'r'
+        s[13] = 'l'
+        s[25] = 'm'
+        s[26] = '1'  # Force use of version 1 of texture
+        imagename3 = '%s' % "".join(s)
+        imgfilename3 = os.path.join(local_data_dir, roverImageDir, 'sol%04d' %(sol), 'rdr', imagename3 )
+        print('#### MRL texture not found; looking for alternative (MRL) texture in cache: ', imgfilename3)
+        if os.path.isfile(imgfilename3):
+            print('   ----> MRL texture found.')
+            return imgfilename3
+        else :
+            print ('##!## I give up, no texture available in cache, loking online....')
+
     # Nothing in cache: try downloading...
     
-    retrievedir = os.path.join(os.path.dirname(local_data_dir), roverImageDir, '%05d' %( sol ) )
-    print ('Texture files are cached into ', retrievedir)
+    print ('local_data_dir=',local_data_dir)
+    print ('os.path.dirname(local_data_dir)=',os.path.dirname(local_data_dir))
+    print ('roverImageDir=',roverImageDir)
+    print ('sol=','sol%04d' %( sol ))
+    retrievedir = os.path.join(os.path.dirname(local_data_dir), roverImageDir, 'sol%04d' %( sol ) , 'rdr')
+    print ('Texture files will be downloaded into ', retrievedir)
     if not os.path.exists(retrievedir):
         os.makedirs(retrievedir)
 
-   # Try first with EFF texture:
+    # Try first with EFF texture:
     localfile = imgfilename
-
     if rover == OPPORTUNITY or rover == SPIRIT:
-        remotefile = os.path.join(os.path.dirname(nasaimg_path), roverImageDir, '%03d' %(sol), imagename.upper() )
+        # https://pds-imaging.jpl.nasa.gov/data/mer/spirit/mer2no_0xxx/browse/sol0005/rdr/
+        # nasaimg_path: https://pds-imaging.jpl.nasa.gov/data/
+        # roverImageDir: mer/spirit/mer2no_0xxx/browse/
+        remotefile = os.path.join(os.path.dirname(nasaimg_path), roverImageDir, 'sol%04d' %(sol), 'rdr', imagename.lower() )
+        
     if rover == CURIOSITY:
         remotefile = os.path.join(os.path.dirname(pdsimg_path), roverImageDir, 'SOL%05d' %(sol), imagename )
 
-    print('Trying to download texture data: ', remotefile)
+    print('Trying to download EFF texture: ', remotefile)
+    print('to local texture folder: ', retrievedir)
+    print('as : ', localfile)
 
     result = download_file(remotefile)
     if(result == False):
       # No EFF texture, try with FFL:
-      print ('WARNING - Cannot find EFF texture: ', remotefile)
-      localfile = imgfilename2  
+      print ('#### EFF texture not found online.')
+      localfile = imgfilename2
       if rover == OPPORTUNITY or rover == SPIRIT:
-          remotefile = os.path.join(os.path.dirname(nasaimg_path), roverImageDir, '%03d' %(sol), imagename2.upper() )
+          remotefile = os.path.join(os.path.dirname(nasaimg_path), roverImageDir, 'sol%04d' %(sol), 'rdr', imagename2.lower() )
       if rover == CURIOSITY:
           remotefile = os.path.join(os.path.dirname(pdsimg_path), roverImageDir, 'SOL%05d' %(sol), imagename2 )
-  
-      print('## FFL texture not found ## - Trying to download alternative (FFL) texture data: ', remotefile)
-      
-      result = download_file(remotefile)
+      imgfilename = imgfilename2 # FFL
+
+      print('Trying to download FFL texture: ', remotefile)
+      print('to local texture folder: ', retrievedir)
+      print('as : ', localfile)
+
+      result = download_file(remotefile) # FFL
       if(result == False):
-         print (' ')
-         print ('>>>>> WARNING <<<<<<<< EFF texture not found too, no texture available: ', remotefile)
-         print (' ')
-         # notextureFilename = os.path.join(os.path.dirname(local_data_dir), 'notexture.jpg' )
-         # print('Using empty texture:', notextureFilename)
-         return None #notextureFilename # Debug/ToDo: continue without texture or dummy texture?
+        print ('#### FFL texture not found online.')
+        localfile = imgfilename3
+        if rover == OPPORTUNITY or rover == SPIRIT:
+            remotefile = os.path.join(os.path.dirname(nasaimg_path), roverImageDir, 'sol%04d' %(sol), 'rdr', imagename3.lower() )
+        if rover == CURIOSITY:
+            remotefile = os.path.join(os.path.dirname(pdsimg_path), roverImageDir, 'SOL%05d' %(sol), imagename3 )
+
+        imgfilename = imgfilename3
+        print('Trying to download MRL texture: ', remotefile)
+        print('to local texture folder: ', retrievedir)
+        print('as : ', localfile)
+        result = download_file(remotefile) # MRL
+        if(result == False):
+          print ('#### MRL texture not found, I give up, cannot find any texture online.')
+          return None
+        else :
+          print('  ---> MRL texture successfully downloaded.')
+          imgfilename = os.path.join(local_data_dir, roverImageDir, 'sol%04d' %(sol), 'rdr', imagename3 )
+          return imgfilename # MRL
       else :
-         imgfilename = imgfilename2
-    
-    if os.path.isfile(localfile):
-        print ('Texture file successfully downloaded: ',imgfilename) 
-        return imgfilename
+        print('  ---> FFL texture successfully downloaded.')
+        imgfilename = os.path.join(local_data_dir, roverImageDir, 'sol%04d' %(sol), 'rdr', imagename2 )
+        return imagename #FFL texture
+    else :
+      print('  ---> EFF texture successfully downloaded.')
+      imgfilename = os.path.join(local_data_dir, roverImageDir, 'sol%04d' %(sol), 'rdr', imagename )
+      return imgfilename #EFF texture
+
+
+#    if os.path.isfile(localfile):
+#        print ('Texture file successfully downloaded: ',imgfilename)
+#        return imgfilename
 
 
 def get_16bit_texture_image(rover, sol, imgname):
@@ -482,7 +532,7 @@ def get_16bit_texture_image(rover, sol, imgname):
         print('Loading 16 bit texture (rad) from cache: ', imgfilename)
         return imgfilename
 
-    retrievedir = os.path.join(os.path.dirname(local_data_dir), roverDataDir, 'sol%05d' %( sol ) )
+    retrievedir = os.path.join(os.path.dirname(local_data_dir), roverImageDir, 'sol%04d' %( sol ) , 'rdr')
     print ('16 bit texture files (rad) are cached into ', retrievedir)
     if not os.path.exists(retrievedir):
         os.makedirs(retrievedir)
@@ -522,14 +572,18 @@ def get_depth_image(rover, sol, imgname):
         s[25] = 'm' 
 
     xyzname = '%s' % "".join(s)
-    xyzfilename = os.path.join(local_data_dir, roverDataDir, 'sol%05d' %(sol), xyzname )
+    xyzfilename = os.path.join(local_data_dir, roverDataDir, 'sol%04d' %(sol), 'rdr', xyzname )
+
+    print ('XYZ data file:', xyzfilename)
+    print ('Searching in cache....')
 
     if os.path.isfile(xyzfilename):
-        print('Loading xyz data from cache: ', xyzfilename)
+        print('  ---> OK, XYZ found in cache')
         return xyzfilename
 
-    retrievedir = os.path.join(local_data_dir, roverDataDir, 'sol%05d' %(sol) )
-    print ('3d files (xyz) are cached into ', retrievedir)
+    print ('#### XYZ not found in cache, looking online...')
+    retrievedir = os.path.join(local_data_dir, roverDataDir, 'sol%04d' %(sol) , 'rdr')
+
     if not os.path.exists(retrievedir):
         os.makedirs(retrievedir)
 
@@ -540,14 +594,23 @@ def get_depth_image(rover, sol, imgname):
     if rover == CURIOSITY:
         remotefile = os.path.join(os.path.dirname(pdsimg_path), roverDataDir, 'SOL%05d' %(sol), xyzname )
 
-    print('downloading xyz: ', remotefile)
+    print('Trying to download  xyz: ', remotefile)
+    print('to local XYZ folder: ', retrievedir)
+    print('as: ', localfile)
 
     result = download_file(remotefile)
     if(result == False):
+        print('>>>>>>> Download of XYZ failed: ',remotefile)
         return None
 
+    print('  ---> XYZ download successful.')
+
     if os.path.isfile(localfile):
+        print('Local file:',localfile)
         return xyzfilename
+    else :
+        print('>>> ERROR >>>> Can\'t find local file just downloaded!:', localfile)
+        return None
 
 
 def convert_to_png(image_16bit_texture_filename):
@@ -1101,143 +1164,150 @@ def create_mesh_from_depthimage(rover, sol, image_depth_filename, image_texture_
               #me.show_double_sided = True
               bpy.ops.mesh.uv_texture_add()
 
+              uvteller = 0
+
+              #per face !
+              for j in range(0, LINES -1):
+                  for k in range(0, LINE_SAMPLES-1):
+                      tc1 = Vector(((1.0 / LINE_SAMPLES) * k, 1.0 - (1.0 / LINES) * j))
+                      tc2 = Vector(((1.0 / LINE_SAMPLES) * (k + 1), 1.0 - (1.0 / LINES) * j))
+                      tc3 = Vector(((1.0 / LINE_SAMPLES) * (k + 1), 1.0 - (1.0 / LINES) * (j + 1)))
+                      tc4 = Vector(((1.0 / LINE_SAMPLES) * k, 1.0 - (1.0 / LINES) * (j + 1)))
+
+                      bpy.data.objects[TARGET_NAME].data.uv_layers[0].data[uvteller].uv = tc1
+                      uvteller = uvteller + 1
+                      bpy.data.objects[TARGET_NAME].data.uv_layers[0].data[uvteller].uv = tc2
+                      uvteller = uvteller + 1
+                      bpy.data.objects[TARGET_NAME].data.uv_layers[0].data[uvteller].uv = tc3
+                      uvteller = uvteller + 1
+                      bpy.data.objects[TARGET_NAME].data.uv_layers[0].data[uvteller].uv = tc4
+                      uvteller = uvteller + 1
+
       except IOError:
-          print('Oh dear. Missing %s' %(image_texture_filename))
+          print('Oh dear. Problems with %s' %(image_texture_filename))
 
-      uvteller = 0
+      finally:
 
-      #per face !
-      for j in range(0, LINES -1):
-          for k in range(0, LINE_SAMPLES-1):
-              tc1 = Vector(((1.0 / LINE_SAMPLES) * k, 1.0 - (1.0 / LINES) * j))
-              tc2 = Vector(((1.0 / LINE_SAMPLES) * (k + 1), 1.0 - (1.0 / LINES) * j))
-              tc3 = Vector(((1.0 / LINE_SAMPLES) * (k + 1), 1.0 - (1.0 / LINES) * (j + 1)))
-              tc4 = Vector(((1.0 / LINE_SAMPLES) * k, 1.0 - (1.0 / LINES) * (j + 1)))
 
-              bpy.data.objects[TARGET_NAME].data.uv_layers[0].data[uvteller].uv = tc1
-              uvteller = uvteller + 1
-              bpy.data.objects[TARGET_NAME].data.uv_layers[0].data[uvteller].uv = tc2
-              uvteller = uvteller + 1
-              bpy.data.objects[TARGET_NAME].data.uv_layers[0].data[uvteller].uv = tc3
-              uvteller = uvteller + 1
-              bpy.data.objects[TARGET_NAME].data.uv_layers[0].data[uvteller].uv = tc4
-              uvteller = uvteller + 1
-
-    else :
-      print ('  ---  Texture not available, skipping...');
-      #example : 2N295212876EFFB1DNP1950L0M1
-
+ 
 
 
 ### TEXTURE END? ##############
 
 
-    ### Clenaup mesh #######
+        ### Clenaup mesh #######
 
-    # remove verts lacking xyz data
-    bpy.ops.object.mode_set(mode='EDIT')
-    mesh_ob = bpy.context.object
-    me = mesh_ob.data
-    bm = bmesh.from_edit_mesh(me)
+        # remove verts lacking xyz data
+        bpy.ops.object.mode_set(mode='EDIT')
+        mesh_ob = bpy.context.object
+        me = mesh_ob.data
+        bm = bmesh.from_edit_mesh(me)
 
-    verts = [v for v in bm.verts if v.co[0] == 0.0 and v.co[1] == 0.0 and v.co[2] == 0.0]
-    bmesh.ops.delete(bm, geom=verts, context="VERTS")
-    bmesh.update_edit_mesh(me)
+        verts = [v for v in bm.verts if v.co[0] == 0.0 and v.co[1] == 0.0 and v.co[2] == 0.0]
+        bmesh.ops.delete(bm, geom=verts, context="VERTS")
+        bmesh.update_edit_mesh(me)
 
-    # remove redundant verts
-    bpy.ops.object.mode_set(mode='EDIT')
-    mesh_ob = bpy.context.object
-    me = mesh_ob.data
-    bm = bmesh.from_edit_mesh(me)
+        # remove redundant verts
+        bpy.ops.object.mode_set(mode='EDIT')
+        mesh_ob = bpy.context.object
+        me = mesh_ob.data
+        bm = bmesh.from_edit_mesh(me)
 
-    verts = [v for v in bm.verts if len(v.link_faces) == 0]
-    bmesh.ops.delete(bm, geom=verts, context="VERTS")
-    bmesh.update_edit_mesh(me)
+        verts = [v for v in bm.verts if len(v.link_faces) == 0]
+        bmesh.ops.delete(bm, geom=verts, context="VERTS")
+        bmesh.update_edit_mesh(me)
 
-    bpy.ops.object.editmode_toggle()
+        bpy.ops.object.editmode_toggle()
 
-    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
-    bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
+        bpy.ops.object.mode_set(mode='OBJECT')
 
-    # mesh generation completed, now add camera and caption:
+        # mesh generation completed, now add camera and caption:
 
-    ##### Add camera ####
-    cam = bpy.data.cameras.new('Camera')
-    cam.lens = 40
-    cam.clip_start = 0.01
-    cam_ob = bpy.data.objects.new('Cam-' + os.path.basename(FileAndExt[0]), cam)
+        ##### Add camera ####
+        cam = bpy.data.cameras.new('Camera')
+        cam.lens = 40
+        cam.clip_start = 0.01
+        cam_ob = bpy.data.objects.new('Cam-' + os.path.basename(FileAndExt[0]), cam)
 
-    bRoverVec = bRoverVec * 0.1
+        bRoverVec = bRoverVec * 0.1
 
-    mat_loc = mathutils.Matrix.Translation(bRoverVec)
-    mat_trans = mathutils.Matrix.Translation((0.0, 0.0, 0.15))
+        mat_loc = mathutils.Matrix.Translation(bRoverVec)
+        mat_trans = mathutils.Matrix.Translation((0.0, 0.0, 0.15))
 
-    cam_ob.matrix_world = mat_loc @ mat_trans
+        cam_ob.matrix_world = mat_loc @ mat_trans
 
-    # Create Credit text
-    trover = [ 'Spirit', 'Opportunity', 'Curiosity' ]
+        # Create Credit text
+        trover = [ 'Spirit', 'Opportunity', 'Curiosity' ]
 
-    if image_texture_filename != None:
-      if creation_date.startswith( '\"' ):
-          date_object = datetime.strptime(creation_date[1:23], '%Y-%m-%dT%H:%M:%S.%f')
-      else:
-          date_object = datetime.strptime(creation_date[0:22], '%Y-%m-%dT%H:%M:%S.%f')
-
-      # MSL provides Right Navcam Depth data
-      s = list(os.path.basename(image_texture_filename))
-      if rover == OPPORTUNITY or rover == SPIRIT:
-          if s[23] == 'L' or s[23] == 'l':
-              whichcam = 'Left'
+        if image_texture_filename != None:
+          if creation_date.startswith( '\"' ):
+              date_object = datetime.strptime(creation_date[1:23], '%Y-%m-%dT%H:%M:%S.%f')
           else:
-              whichcam = 'Right'
+              date_object = datetime.strptime(creation_date[0:22], '%Y-%m-%dT%H:%M:%S.%f')
 
-      if rover == CURIOSITY:
-          if s[1]  == 'L' or s[1] == 'l':
-              whichcam = 'Left'
-          else:
-              whichcam = 'Right'
+          # MSL provides Right Navcam Depth data
+          s = list(os.path.basename(image_texture_filename))
+          if rover == OPPORTUNITY or rover == SPIRIT:
+              if s[23] == 'L' or s[23] == 'l':
+                  whichcam = 'Left'
+              else:
+                  whichcam = 'Right'
 
-      tagtext = trover[rover-1] + ' ' + whichcam +' Navcam Image at Sol ' + str(sol) + '\n' + str(date_object.strftime('%d %b %Y %H:%M:%S')) + ' UTC\nNASA / JPL-CALTECH / phaseIV'
+          if rover == CURIOSITY:
+              if s[1]  == 'L' or s[1] == 'l':
+                  whichcam = 'Left'
+              else:
+                  whichcam = 'Right'
+
+          tagtext = trover[rover-1] + ' ' + whichcam +' Navcam Image at Sol ' + str(sol) + '\n' + str(date_object.strftime('%d %b %Y %H:%M:%S')) + ' UTC\nNASA / JPL-CALTECH / phaseIV'
+        else :
+          tagtext = 'Texture not found'
+
+        bpy.ops.object.text_add(enter_editmode=True, location = (-0.02, -0.0185, -0.05)) #location = (-0.018, -0.0185, -0.05))
+        bpy.ops.font.delete(type='PREVIOUS_WORD')
+        bpy.ops.font.text_insert(text=str(tagtext))
+        bpy.ops.object.editmode_toggle()
+
+        textSize = 0.001
+        text_ob = bpy.context.view_layer.objects.active
+        text_ob.scale = [textSize, textSize, textSize]
+
+        tempColl = find_collection(bpy.context, text_ob)
+        try:
+          theSolCollection.objects.link(text_ob)
+          tempColl.objects.unlink(text_ob)
+        except:
+          print(' ')
+
+        found = None
+
+        for i in range(len(bpy.data.materials)) :
+            if bpy.data.materials[i].name == 'White text':
+                mat = bpy.data.materials[i]
+                found = True
+        if not found:
+            mat = create_named_material(bpy.context, 'White text')
+
+        text_ob.data.materials.append(mat)
+        text_ob.parent = cam_ob
+
+        objloc = Vector(mesh_ob.location)
+        rovloc = Vector(bRoverVec)
+        distvec = rovloc - objloc
+
+        expoint = obj.matrix_world.to_translation()+Vector((0.0, 0.0, -0.04-distvec.length*0.1))
+        look_at(cam_ob, expoint)
+
+        theSolCollection.objects.link(cam_ob)
+        bpy.context.scene.camera = cam_ob
+        #bpy.context.scene.update()
+
+        print ('Mesh generation complete. Note: you must turn on rendering or preview to see texture.')
+
     else :
-      tagtext = 'Texture not found'
-
-    bpy.ops.object.text_add(enter_editmode=True, location = (-0.02, -0.0185, -0.05)) #location = (-0.018, -0.0185, -0.05))
-    bpy.ops.font.delete(type='PREVIOUS_WORD')
-    bpy.ops.font.text_insert(text=str(tagtext))
-    bpy.ops.object.editmode_toggle()
-
-    textSize = 0.001
-    text_ob = bpy.context.view_layer.objects.active
-    text_ob.scale = [textSize, textSize, textSize]
-
-    tempColl = find_collection(bpy.context, text_ob)
-    theSolCollection.objects.link(text_ob)
-    tempColl.objects.unlink(text_ob)
-
-    found = None
-
-    for i in range(len(bpy.data.materials)) :
-        if bpy.data.materials[i].name == 'White text':
-            mat = bpy.data.materials[i]
-            found = True
-    if not found:
-        mat = create_named_material(bpy.context, 'White text')
-
-    text_ob.data.materials.append(mat)
-    text_ob.parent = cam_ob
-
-    objloc = Vector(mesh_ob.location)
-    rovloc = Vector(bRoverVec)
-    distvec = rovloc - objloc
-
-    expoint = obj.matrix_world.to_translation()+Vector((0.0, 0.0, -0.04-distvec.length*0.1))
-    look_at(cam_ob, expoint)
-
-    theSolCollection.objects.link(cam_ob)
-    bpy.context.scene.camera = cam_ob
-    #bpy.context.scene.update()
-
-    print ('Mesh generation complete. Note: you must turn on rendering or preview to see texture.')
+      print ('  ---  Texture not available, skipping...');
+      #example : 2N295212876EFFB1DNP1950L0M1
 
 
 def look_at(obj_camera, point):
@@ -1269,7 +1339,7 @@ def draw(self, context):
         print("Not a valid Left Navcam imagename: should begin by 1N or 2N for MER, by N for MSL.")
 
 
-class NavcamToolsPanel(bpy.types.Panel):
+class ROVER_PT_NavcamToolsPanel(bpy.types.Panel):
     bl_label = "Mars Rover Import"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
@@ -1285,13 +1355,13 @@ def menu_func_import(self, context):
 def register():
     bpy.utils.register_class(NavcamDialogOperator)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
-    bpy.utils.register_class(NavcamToolsPanel)
+    bpy.utils.register_class(ROVER_PT_NavcamToolsPanel)
 
 
 def unregister():
     bpy.utils.unregister_class(NavcamDialogOperator)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
-    bpy.utils.unregister_class(NavcamToolsPanel)
+    bpy.utils.unregister_class(ROVER_PT_NavcamToolsPanel)
 
 def ShowMessageBox(message = "", title = "Message Box", icon = 'INFO'):
 
@@ -1299,7 +1369,9 @@ def ShowMessageBox(message = "", title = "Message Box", icon = 'INFO'):
         self.layout.label(text=message)
 
     bpy.context.window_manager.popup_menu(draw, title = title, icon = icon)
-    
+
+
+
     
 if __name__ == "__main__":
     register()
