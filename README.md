@@ -13,7 +13,7 @@ The Navcam-importer addon is able to locate and decode the depth maps and import
 - for Opportunity:   1N142657823MRD3221P1971L0M1
 - for Curiosity:     NLB_499684210EDR_F0501222NCAM00290M_
 
-Tip: you can use [PFB converter in this repo](https://github.com/jumpjack/VST-converter) to process .PFB files on [PDS servers](https://pds-imaging.jpl.nasa.gov/data/mer/spirit/mer2mw_0xxx/data/navcam/site0137/): each PFB groups multiple images/meshes into one single mesh, and the converter extracts the list of images in a format directly usable by this script for importing in Blender.
+Tip: you can use [PFB converter in this repo](https://github.com/jumpjack/VST-converter) to process .PFB files downloaded from [PDS servers](https://pds-imaging.jpl.nasa.gov/data/mer/spirit/mer2mw_0xxx/data/navcam/site0137/): each PFB contains multiple images/meshes into one single mesh, and the converter extracts the list of images in a format directly usable by this script for importing in Blender.
 
 .PFB files are grouped by "site"; each "site" is a location along rover traverse map: all XYZ files/images/products (and hence all PFB files) created in the frame of same site have the site itself as the origin of reference system, hence they can all be imported together in Blender and be automatically placed in the right position in space.
 
