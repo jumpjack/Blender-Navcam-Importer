@@ -34,9 +34,9 @@ The resulting mesh, which is in no way scientifically accurate, can contain over
 Check this [page](https://github.com/phaseIV/Blender-Navcam-Importer/wiki/Instructions) for information about obtaining Navcam image names.
 
 ## UPDATES
-17 Apr 2016: The addon is upgraded with an option to use 16bit RAD images for texturing the mesh.  
-14 Jan 2019: Rewrote parts to make the addon compatible with Blender 2.8.
-July 2022: Added support for Pancam and Hazcam, images; added support for meshes without texture without interrupting execution.
+- 17 Apr 2016: The addon is upgraded with an option to use 16bit RAD images for texturing the mesh.  
+- 14 Jan 2019: Rewrote parts to make the addon compatible with Blender 2.8
+- July 2022: Added support for Pancam and Hazcam, images; added support for meshes without texture without interrupting execution.
 
 ## Notes
 The addon caches all downloaded data in Blender’s Temp directory. Texture images will get packed in the Blend file.
